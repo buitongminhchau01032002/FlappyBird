@@ -10,6 +10,6 @@ Mình là một người thích code và làm những thứ đơn giản với c
 
 Liên hệ với mình tại đây:
 
-facebook: facebook.com/buitongminhchau
+facebook: https://www.facebook.com/buitongminhchau
 
 email: buitongminhchau01032002@gmail.com
