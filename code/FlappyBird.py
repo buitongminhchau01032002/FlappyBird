@@ -12,7 +12,7 @@ TIME_CHANGE_BIRD = 4 # Thời gian thay đổi ảnh chim
 SPEED_BIRD_FLY = -15 # Tốc độ mỗi lần chim bay lên
 IMG_BIRD_1 = pygame.image.load('img/bird1.png') # Ảnh chim 1
 IMG_BIRD_2 = pygame.image.load('img/bird2.png') # Ảnh chim 2
-IMG_COT = pygame.image.load('img/conlumn.png') # Ảnh cột
+IMG_COT = pygame.image.load('img/column.png') # Ảnh cột
 GRAVITATION = 1.25 # Gia tốc rơi
 
 # màu      R    B    G
@@ -20,10 +20,10 @@ BLACK = (  0,   0,   0)
 WHITE = (255, 255, 255)
 GREY  = (200, 200, 200)
 
-SIZE_CONLUMN = 70 # Bề rộng cột
+SIZE_COLUMN = 70 # Bề rộng cột
 SIZE_BLANK = 200 # Độ rộng khoảng trống giữa cột
-DISTANCE_CONLUMN = 225 # Khoảng cách 2 cột kế tiếp
-SPEED_CONLUMN = 5 # Tốc độ di chuyển của cột
+DISTANCE_COLUMN = 225 # Khoảng cách 2 cột kế tiếp
+SPEED_COLUMN = 5 # Tốc độ di chuyển của cột
 
 TIME_CHANGE_COLOR_TEXT = 9 # Thời gian thay đổi màu chữ (chữ nhấp nháy)
 
@@ -53,7 +53,7 @@ class Bird(): # Chim
         else:
             self.status += 1
 
-class Conlumn():
+class Column():
     def __init__(self, x, y = 'default'): # x, y là vị trí phía trên bên trái của khoảng trống
         self.x = x
         self.y = random.randrange(80, WINDOWHEIGHT - SIZE_BLANK - 100, 5) # lấy y ngẫu nhiên
@@ -66,31 +66,31 @@ class Conlumn():
         DISPLAYSURF.blit(IMG_COT, (self.x, self.y + SIZE_BLANK))
     
     def update(self):
-        self.x -= SPEED_CONLUMN
+        self.x -= SPEED_COLUMN
 
-class Conlumns():
+class Columns():
     def __init__(self):
-        self.listConlumn = []
+        self.listColumn = []
         # 3 cột là đủ cho màn hình
         for i in range(3):
-            self.listConlumn.append(Conlumn(( DISTANCE_CONLUMN*i) + WINDOWWIDTH))
+            self.listColumn.append(Column(( DISTANCE_COLUMN*i) + WINDOWWIDTH))
 
     # Tạo list cột mới khi vào game
-    def makeNewListConlumn(self):
-        self.listConlumn = []
+    def makeNewListColumn(self):
+        self.listColumn = []
         for i in range(3):
-            self.listConlumn.append(Conlumn(( DISTANCE_CONLUMN*i) + WINDOWWIDTH))
+            self.listColumn.append(Column(( DISTANCE_COLUMN*i) + WINDOWWIDTH))
     def draw(self):
-        for i in range(len(self.listConlumn)):
-            self.listConlumn[i].draw()
+        for i in range(len(self.listColumn)):
+            self.listColumn[i].draw()
     
     def update(self):
-        for i in range(len(self.listConlumn)):
-            self.listConlumn[i].update()
+        for i in range(len(self.listColumn)):
+            self.listColumn[i].update()
         # Xoá cột bên trái khi qua hết màn hình, tạo thêm cột tiếp theo
-        if self.listConlumn[0].x < -SIZE_CONLUMN:
-            self.listConlumn.pop(0)
-            self.listConlumn.append(Conlumn(self.listConlumn[1].x + DISTANCE_CONLUMN))
+        if self.listColumn[0].x < -SIZE_COLUMN:
+            self.listColumn.pop(0)
+            self.listColumn.append(Column(self.listColumn[1].x + DISTANCE_COLUMN))
     
 class Scenes():
     def __init__(self, option = 1):
@@ -124,9 +124,9 @@ class Scenes():
             pygame.display.update()
             FPSCLOCK.tick(FPS)
         self.option = 2
-    def gamePlay(self, bird, conlumns, score):
+    def gamePlay(self, bird, columns, score):
         score.text = '0'
-        conlumns.makeNewListConlumn()
+        columns.makeNewListColumn()
         bird.speed = SPEED_BIRD_FLY
         
         while True:
@@ -142,23 +142,23 @@ class Scenes():
             bird.draw()
             bird.update(mouseClick)
 
-            conlumns.draw()
-            conlumns.update()
+            columns.draw()
+            columns.update()
             
             # Cộng thêm điểm
-            if GameControl.isAddScore(conlumns) == True:
+            if GameControl.isAddScore(columns) == True:
                 score.update()
             score.draw()
 
             # Kiểm tra va chạm
-            isCollide = GameControl.isCollide(bird, conlumns)
+            isCollide = GameControl.isCollide(bird, columns)
             if isCollide == True:
                 break
 
             pygame.display.update()
             FPSCLOCK.tick(FPS)
         self.option = 3
-    def gameOver(self, bird, conlumns, score):
+    def gameOver(self, bird, columns, score):
         bird.speed = 0
         headingGameOver = Heading('GAMEOVER')
         birdStatus = bird.status
@@ -171,7 +171,7 @@ class Scenes():
                     pygame.quit()
                     sys.exit()
             
-            conlumns.draw()
+            columns.draw()
             bird.draw()
             bird.update(False)
             bird.status = birdStatus
@@ -206,7 +206,7 @@ class Scenes():
                     mouseClick = True
             if mouseClick == True:
                 break
-            conlumns.draw()
+            columns.draw()
             bird.draw()
             headingGameOver.draw()
             clickToReplay.draw()
@@ -267,39 +267,39 @@ class Heading(Text): # Tiêu đề (chữ to)
             self.y = WINDOWHEIGHT/2 - 90
 
 class GameControl():
-    def isCollide(bird, conlumns): # Kiểm tra va chạm
-        def isCollide1Conlumn(bird, conlumn):
+    def isCollide(bird, columns): # Kiểm tra va chạm
+        def isCollide1Column(bird, column):
             # Các giới hạn chim
             limitBirdTop = bird.y
             limitBirdBottom = bird.y + SIZE_BIRD[1]
             limitBirdLeft = bird.x
             limitBirdRight = bird.x + SIZE_BIRD[0]
             # Các giới hạn cột
-            limitConlumnLeft = conlumn.x
-            limitConlumnRight = conlumn.x + SIZE_CONLUMN
-            limitConlumnTop = conlumn.y
-            limitConlumnBottom = conlumn.y + SIZE_BLANK 
+            limitColumnLeft = column.x
+            limitColumnRight = column.x + SIZE_COLUMN
+            limitColumnTop = column.y
+            limitColumnBottom = column.y + SIZE_BLANK 
             # Kiểm tra va chạm
-            if limitBirdLeft > limitConlumnRight - SIZE_CONLUMN/4:
+            if limitBirdLeft > limitColumnRight - SIZE_COLUMN/4:
                 return False
-            if (limitBirdRight - limitConlumnLeft) > 0 and (limitConlumnTop - limitBirdTop) > 0:
+            if (limitBirdRight - limitColumnLeft) > 0 and (limitColumnTop - limitBirdTop) > 0:
                 return True
-            if  (limitBirdBottom - limitConlumnBottom) > 0 and (limitBirdRight - limitConlumnLeft) > 0:
+            if  (limitBirdBottom - limitColumnBottom) > 0 and (limitBirdRight - limitColumnLeft) > 0:
                 return True
             if  limitBirdBottom >= WINDOWHEIGHT or limitBirdTop < -100:
                 return True
             return False
         # Kiểm tra va chạm cho tất cả các cột
-        for i in range(len(conlumns.listConlumn)):
-            if isCollide1Conlumn(bird, conlumns.listConlumn[i]):
+        for i in range(len(columns.listColumn)):
+            if isCollide1Column(bird, columns.listColumn[i]):
                 return True
         return False
-    def isAddScore(conlumns): # Cộng thêm điểm
+    def isAddScore(columns): # Cộng thêm điểm
         midWindow = WINDOWWIDTH/2
         # Cột đến giữa màn hình thì cộng điểm
-        for i in range(len(conlumns.listConlumn)):
-            midConlumn = conlumns.listConlumn[i].x + SIZE_CONLUMN/2
-            if abs(midWindow - midConlumn) <= SPEED_CONLUMN/2:
+        for i in range(len(columns.listColumn)):
+            midColumn = columns.listColumn[i].x + SIZE_COLUMN/2
+            if abs(midWindow - midColumn) <= SPEED_COLUMN/2:
                 return True
         return False
 
@@ -315,15 +315,15 @@ def main():
     IMG_BG = pygame.image.load('img/bg.bmp').convert()
     scene = Scenes()
     bird = Bird()
-    conlumns = Conlumns()
+    columns = Columns()
     score = Score('0')
     while True:
         if scene.option == 1:
             scene.gameStart(bird)
         elif scene.option == 2:
-            scene.gamePlay(bird, conlumns, score)
+            scene.gamePlay(bird, columns, score)
         elif scene.option == 3:
-            scene.gameOver(bird, conlumns, score)
+            scene.gameOver(bird, columns, score)
 
 if __name__ == '__main__':
     main()
